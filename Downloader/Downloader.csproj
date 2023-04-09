@@ -25,8 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SharpSerializer" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +56,22 @@
       <PackagePath>\</PackagePath>
     </None>
     <None Include="C:\Users\ayiwe\Desktop\CS\Downloader\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\luaExpect.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\VodDown.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\VodLogin.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Crawler\" />
   </ItemGroup>
 
 </Project>

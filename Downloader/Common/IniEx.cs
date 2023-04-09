@@ -15,9 +15,9 @@ namespace Downloader.Common
             this.iniFileName = iniFileName;
         }
         private string iniFileName { get; }
-        [DllImport("kernel32")]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
-        [DllImport("kernel32")]
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retval, int size, string filePath);
         public void WriteContentValue(string section, string key, string value)
         {
@@ -26,8 +26,7 @@ namespace Downloader.Common
         public string ReadContentValue(string section, string key)
         {
             StringBuilder temp = new StringBuilder(1024);
-            if (File.Exists(iniFileName))
-                GetPrivateProfileString(section, key, "", temp, 1024, iniFileName);
+            GetPrivateProfileString(section, key, "", temp, 1024, iniFileName);
             return temp.ToString();
         }
     }

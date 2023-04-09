@@ -33,12 +33,11 @@
             // 
             // BaseForm
             // 
-            AutoScaleDimensions = new SizeF(11F, 24F);
+            AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(978, 600);
+            ClientSize = new Size(180, 124);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Margin = new Padding(4, 4, 4, 4);
-            MaximizeBox = false;
+            Margin = new Padding(7, 8, 7, 8);
             Name = "BaseForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "BaseForm";

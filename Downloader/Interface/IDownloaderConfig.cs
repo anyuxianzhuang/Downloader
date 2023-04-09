@@ -1,9 +1,10 @@
-﻿namespace Downloader.Config
+﻿namespace Downloader.Interface
 {
-    public interface IConfig
+    public interface IDownloaderConfig
     {
         string GetExeFilePath();
         string exePath { get; }
         bool DependencyConfig();
+        int retry { get; set; }
     }
 }

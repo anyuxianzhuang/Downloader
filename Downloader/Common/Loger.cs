@@ -20,7 +20,7 @@ namespace Downloader.Common
             if (showDebugInfo)
                 MessageAcceptanceHandler?.Invoke(msg);
         }
-        public static bool showDebugInfo { get; set; } = true;
+        public static bool showDebugInfo { get; set; } = false;
         public delegate void MessageAcceptanceDelegate(object msg);
         public static MessageAcceptanceDelegate MessageAcceptanceHandler;
 

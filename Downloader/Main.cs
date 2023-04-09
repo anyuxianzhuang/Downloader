@@ -1,10 +1,14 @@
 ﻿using Downloader.Common;
-using Downloader.Config;
+using Downloader.Interface;
 using Downloader.Downloader;
-using Downloader.Model;
-using Downloader.Model.ViewModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using Downloader.Config;
+using Downloader.Task;
+using Downloader.Model;
+using Downloader.Factory;
+using System.Runtime.InteropServices;
+using Polenter.Serialization;
 
 namespace Downloader
 {
@@ -13,9 +17,11 @@ namespace Downloader
         public Main()
         {
             InitializeComponent();
+            this.ShowInTaskbar = false;
+            调试模式DToolStripMenuItem.Checked = Loger.showDebugInfo;
             Loger.MessageAcceptanceHandler += (msg) =>
             {
-                InvokeFun(() =>
+                BeginInvokeFun(() =>
                 {
                     string msgStr = $"{DateTime.Now.ToString("MM-dd HH:mm:ss")} {msg?.ToString()}";
                     ShowMsg(msgStr);
@@ -27,10 +33,10 @@ namespace Downloader
 
         private int FocusIndex;
         private TaskManager taskManager = new TaskManager();
-        private BindingList<DMFTaskDTO> dMFTaskDTOs = new BindingList<DMFTaskDTO>();
+        private BindingList<TaskDTO> dMFTaskDTOs = new BindingList<TaskDTO>();
         private void LoadData()
         {
-            dMFTaskDTOs = new BindingList<DMFTaskDTO>(taskManager.dMFTaskDTOs);
+            dMFTaskDTOs = new BindingList<TaskDTO>(taskManager.dMFTaskDTOs);
             toolStripStatusLabel1.Text = string.Format("共{0}个任务", dMFTaskDTOs.Count);
             if (dataGridView1.SelectedRows.Count > 0)
                 FocusIndex = dataGridView1.SelectedRows[0].Index;
@@ -43,7 +49,7 @@ namespace Downloader
         {
             Option option = new Option();
             if (option.ShowDialog() == DialogResult.OK)
-                InfoMessage("软件配置重启后生效");
+                InfoMessage("已运行任务软件配置重启后生效");
         }
 
         private void 关于AToolStripMenuItem_Click(object sender, EventArgs e)
@@ -62,8 +68,12 @@ namespace Downloader
 
         private void UpdateLoginUI()
         {
-            if (GUIConfig.isLogin)
-                toolStripButton2.Text = "已登录";
+            if (GUIConfig._DMFConfig.isLogin && GUIConfig._VodkaConfig.isLogin)
+                toolStripButton2.Text = "已登录(DMF,Vodka)";
+            else if (GUIConfig._DMFConfig.isLogin)
+                toolStripButton2.Text = "已登录(DMF)";
+            else if (GUIConfig._VodkaConfig.isLogin)
+                toolStripButton2.Text = "已登录(Vodka)";
             else
                 toolStripButton2.Text = "登录";
         }
@@ -75,10 +85,10 @@ namespace Downloader
             var selectRows = dataGridView1.SelectedRows;
             if (selectRows != null)
             {
-                List<DMFTaskDTO> startList = new List<DMFTaskDTO>();
+                List<TaskDTO> startList = new List<TaskDTO>();
                 foreach (DataGridViewRow selectRow in selectRows)
                 {
-                    DMFTaskDTO dto = selectRow.DataBoundItem as DMFTaskDTO;
+                    TaskDTO dto = selectRow.DataBoundItem as TaskDTO;
                     if (dto != null)
                         startList.Add(dto);
                 }
@@ -93,10 +103,10 @@ namespace Downloader
             var selectRows = dataGridView1.SelectedRows;
             if (selectRows != null)
             {
-                List<DMFTaskDTO> startList = new List<DMFTaskDTO>();
+                List<TaskDTO> startList = new List<TaskDTO>();
                 foreach (DataGridViewRow selectRow in selectRows)
                 {
-                    DMFTaskDTO dto = selectRow.DataBoundItem as DMFTaskDTO;
+                    TaskDTO dto = selectRow.DataBoundItem as TaskDTO;
                     if (dto != null)
                         startList.Add(dto);
                 }
@@ -105,59 +115,62 @@ namespace Downloader
                 LoadData();
             }
         }
-        private DMFDownloader NewDMFDownloader(DMFTask dMFTask)
-        {
-            var downloader = new DMFDownloader(dMFTask);
-            downloader.taskStateChangeHandler += (down) =>
-            {
-                InvokeFun(() =>
-                {
-                    LoadData();
-                });
-            };
-            return downloader;
-        }
         private async void toolStripButton4_Click(object sender, EventArgs e)
         {
-            if (!Config.GUIConfig.isLogin)
-            {
-                EorrMessage("尚未登录");
-                return;
-            }
             AddTask addTask = new AddTask();
             switch (addTask.ShowDialog())
             {
                 case DialogResult.OK:
-                    if (addTask.DMFTasks != null)
-                    {
-                        foreach (var task in addTask.DMFTasks)
-                        {
-                            var downloader = NewDMFDownloader(task);
-                            taskManager.Add(downloader);
-                        }
-                        LoadData();
-                    }
+                    CreateNewDownloader(addTask.tasks, addTask.downloaderName);
                     break;
                 case DialogResult.Yes:
-                    if (addTask.DMFTasks != null)
-                    {
-                        List<DMFDownloader> down = new List<DMFDownloader>();
-                        foreach (var task in addTask.DMFTasks)
-                        {
-                            var downloader = NewDMFDownloader(task);
-                            if (!taskManager.Contains(downloader))
-                            {
-                                taskManager.Add(downloader);
-                                down.Add(downloader);
-                            }
-                        }
-                        LoadData();
-                        await taskManager.Start(down, 2);
-                    }
+                    var downs = CreateNewDownloader(addTask.tasks, addTask.downloaderName);
+                    await taskManager.Start(downs, 2);
                     break;
                 default:
                     break;
             }
+        }
+        private DownloaderFactory downloaderFactory = new DownloaderFactory();
+
+        public List<IDownloader> CreateNewDownloader(List<ITask> tasks, string downloaderName)
+        {
+            List<IDownloader> downloaders = new List<IDownloader>();
+            foreach (var task in tasks)
+            {
+                if (downloaderName == nameof(DMFDownloader))
+                {
+                    var dMFDownloader = downloaderFactory.CreateDMFDownloader(GUIConfig._DMFConfig, task);
+                    dMFDownloader.taskStateChangeHandler += (down) =>
+                    {
+                        InvokeFun(() => { LoadData(); });
+                    };
+                    taskManager.Add(dMFDownloader);
+                    downloaders.Add(dMFDownloader);
+                }
+                else if (downloaderName == nameof(VodkaDownloader))
+                {
+                    var vodkaDownloader = downloaderFactory.CreateVodkaDownloader(GUIConfig._VodkaConfig, task);
+                    vodkaDownloader.taskStateChangeHandler += (down) =>
+                    {
+                        InvokeFun(() => { LoadData(); });
+                    };
+                    taskManager.Add(vodkaDownloader);
+                    downloaders.Add(vodkaDownloader);
+                }
+                else if (downloaderName == nameof(VodkaConsoleDownloader))
+                {
+                    var vodkaDownloader = downloaderFactory.CreateVodkaConsoleDownloader(GUIConfig._VodkaConfig, task);
+                    vodkaDownloader.taskStateChangeHandler += (down) =>
+                    {
+                        InvokeFun(() => { LoadData(); });
+                    };
+                    taskManager.Add(vodkaDownloader);
+                    downloaders.Add(vodkaDownloader);
+                }
+            }
+            LoadData();
+            return downloaders;
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
@@ -167,10 +180,10 @@ namespace Downloader
             var selectRows = dataGridView1.SelectedRows;
             if (selectRows != null)
             {
-                List<DMFTaskDTO> stopList = new List<DMFTaskDTO>();
+                List<TaskDTO> stopList = new List<TaskDTO>();
                 foreach (DataGridViewRow selectRow in selectRows)
                 {
-                    DMFTaskDTO dto = selectRow.DataBoundItem as DMFTaskDTO;
+                    TaskDTO dto = selectRow.DataBoundItem as TaskDTO;
                     if (dto != null)
                         stopList.Add(dto);
                 }
@@ -185,6 +198,7 @@ namespace Downloader
 
         private void Main_FormClosed(object sender, FormClosedEventArgs e)
         {
+            var serializer = new SharpSerializer();
             var processesName = Path.GetFileNameWithoutExtension(GUIConfig._DMFConfig.GetExeFilePath());
             if (!string.IsNullOrEmpty(processesName))
                 foreach (var node in Process.GetProcessesByName(processesName))
@@ -224,11 +238,27 @@ namespace Downloader
 
         private void Main_Shown(object sender, EventArgs e)
         {
-            if (!GUIConfig._DMFConfig.DependencyConfig())
-            {
-                EorrMessage("DMF未配置");
+
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var row = dataGridView1.Rows[e.RowIndex];
+            if (row == null)
                 return;
+            TaskDTO dto = row.DataBoundItem as TaskDTO;
+            if (dto != null)
+            {
+                var downloader = taskManager.DTOToDownloader(new List<TaskDTO>() { dto });
+                if (downloader.Count > 0)
+                    downloader[0].Activate();
             }
+        }
+
+        private void toolStripButton8_Click(object sender, EventArgs e)
+        {
+            TaskCapture taskCapture = new TaskCapture();
+            taskCapture.Show();
         }
     }
 }

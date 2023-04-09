@@ -43,7 +43,7 @@
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
             textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(767, 380);
+            textBox1.Size = new Size(470, 195);
             textBox1.TabIndex = 0;
             // 
             // label1
@@ -80,13 +80,16 @@
             // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(879, 739);
+            ClientSize = new Size(593, 514);
             Controls.Add(label3);
             Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(textBox1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5);
+            MaximizeBox = false;
+            MinimizeBox = false;
             Name = "About";
             Text = "About";
             ResumeLayout(false);

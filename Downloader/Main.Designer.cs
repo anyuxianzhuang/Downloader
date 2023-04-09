@@ -37,11 +37,21 @@
             关于AToolStripMenuItem = new ToolStripMenuItem();
             调试模式DToolStripMenuItem = new ToolStripMenuItem();
             dataGridView1 = new DataGridView();
+            id = new DataGridViewTextBoxColumn();
+            cidDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            downloaderType = new DataGridViewTextBoxColumn();
+            downloadTypeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            titleDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            coverDataGridViewImageColumn = new DataGridViewImageColumn();
+            stateDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
+            progress = new DataGridViewTextBoxColumn();
+            stateID = new DataGridViewTextBoxColumn();
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             toolStrip1 = new ToolStrip();
             toolStripButton2 = new ToolStripButton();
             toolStripButton4 = new ToolStripButton();
+            toolStripButton8 = new ToolStripButton();
             toolStripButton5 = new ToolStripButton();
             toolStripButton1 = new ToolStripButton();
             toolStripButton3 = new ToolStripButton();
@@ -52,13 +62,6 @@
             textBox1 = new TextBox();
             groupBox1 = new GroupBox();
             splitContainer1 = new SplitContainer();
-            id = new DataGridViewTextBoxColumn();
-            cidDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            downloadTypeDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            titleDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            coverDataGridViewImageColumn = new DataGridViewImageColumn();
-            stateDataGridViewTextBoxColumn = new DataGridViewTextBoxColumn();
-            stateID = new DataGridViewTextBoxColumn();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             statusStrip1.SuspendLayout();
@@ -79,7 +82,7 @@
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 3, 0, 3);
-            menuStrip1.Size = new Size(1661, 34);
+            menuStrip1.Size = new Size(1145, 34);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -130,7 +133,7 @@
             dataGridView1.BackgroundColor = SystemColors.ButtonFace;
             dataGridView1.BorderStyle = BorderStyle.None;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { id, cidDataGridViewTextBoxColumn, downloadTypeDataGridViewTextBoxColumn, titleDataGridViewTextBoxColumn, coverDataGridViewImageColumn, stateDataGridViewTextBoxColumn, stateID });
+            dataGridView1.Columns.AddRange(new DataGridViewColumn[] { id, cidDataGridViewTextBoxColumn, downloaderType, downloadTypeDataGridViewTextBoxColumn, titleDataGridViewTextBoxColumn, coverDataGridViewImageColumn, stateDataGridViewTextBoxColumn, progress, stateID });
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = SystemColors.Window;
             dataGridViewCellStyle1.Font = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point);
@@ -146,21 +149,98 @@
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersVisible = false;
-            dataGridView1.RowHeadersWidth = 62;
-            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            dataGridView1.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
             dataGridView1.RowTemplate.Height = 30;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(1661, 489);
+            dataGridView1.Size = new Size(1145, 327);
             dataGridView1.TabIndex = 1;
+            dataGridView1.CellDoubleClick += dataGridView1_CellDoubleClick;
+            // 
+            // id
+            // 
+            id.DataPropertyName = "id";
+            id.HeaderText = "id";
+            id.MinimumWidth = 8;
+            id.Name = "id";
+            id.ReadOnly = true;
+            id.Visible = false;
+            // 
+            // cidDataGridViewTextBoxColumn
+            // 
+            cidDataGridViewTextBoxColumn.DataPropertyName = "cid";
+            cidDataGridViewTextBoxColumn.HeaderText = "下载标识";
+            cidDataGridViewTextBoxColumn.MinimumWidth = 8;
+            cidDataGridViewTextBoxColumn.Name = "cidDataGridViewTextBoxColumn";
+            cidDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // downloaderType
+            // 
+            downloaderType.DataPropertyName = "downloaderType";
+            downloaderType.HeaderText = "下载引擎";
+            downloaderType.MinimumWidth = 8;
+            downloaderType.Name = "downloaderType";
+            downloaderType.ReadOnly = true;
+            // 
+            // downloadTypeDataGridViewTextBoxColumn
+            // 
+            downloadTypeDataGridViewTextBoxColumn.DataPropertyName = "downloadType";
+            downloadTypeDataGridViewTextBoxColumn.HeaderText = "下载类型";
+            downloadTypeDataGridViewTextBoxColumn.MinimumWidth = 8;
+            downloadTypeDataGridViewTextBoxColumn.Name = "downloadTypeDataGridViewTextBoxColumn";
+            downloadTypeDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // titleDataGridViewTextBoxColumn
+            // 
+            titleDataGridViewTextBoxColumn.DataPropertyName = "title";
+            titleDataGridViewTextBoxColumn.HeaderText = "标题";
+            titleDataGridViewTextBoxColumn.MinimumWidth = 8;
+            titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
+            titleDataGridViewTextBoxColumn.ReadOnly = true;
+            titleDataGridViewTextBoxColumn.Visible = false;
+            // 
+            // coverDataGridViewImageColumn
+            // 
+            coverDataGridViewImageColumn.DataPropertyName = "cover";
+            coverDataGridViewImageColumn.HeaderText = "封面";
+            coverDataGridViewImageColumn.MinimumWidth = 8;
+            coverDataGridViewImageColumn.Name = "coverDataGridViewImageColumn";
+            coverDataGridViewImageColumn.ReadOnly = true;
+            coverDataGridViewImageColumn.Visible = false;
+            // 
+            // stateDataGridViewTextBoxColumn
+            // 
+            stateDataGridViewTextBoxColumn.DataPropertyName = "stateDisplay";
+            stateDataGridViewTextBoxColumn.HeaderText = "状态";
+            stateDataGridViewTextBoxColumn.MinimumWidth = 8;
+            stateDataGridViewTextBoxColumn.Name = "stateDataGridViewTextBoxColumn";
+            stateDataGridViewTextBoxColumn.ReadOnly = true;
+            // 
+            // progress
+            // 
+            progress.DataPropertyName = "progress";
+            progress.HeaderText = "progress";
+            progress.MinimumWidth = 8;
+            progress.Name = "progress";
+            progress.ReadOnly = true;
+            progress.Visible = false;
+            // 
+            // stateID
+            // 
+            stateID.DataPropertyName = "state";
+            stateID.HeaderText = "stateID";
+            stateID.MinimumWidth = 8;
+            stateID.Name = "stateID";
+            stateID.ReadOnly = true;
+            stateID.Visible = false;
             // 
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new Size(24, 24);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 1069);
+            statusStrip1.Location = new Point(0, 746);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new Padding(1, 0, 17, 0);
-            statusStrip1.Size = new Size(1661, 22);
+            statusStrip1.Size = new Size(1145, 22);
             statusStrip1.TabIndex = 2;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -172,10 +252,10 @@
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(24, 24);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton2, toolStripButton4, toolStripButton5, toolStripButton1, toolStripButton3, toolStripButton7, toolStripButton6 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripButton2, toolStripButton4, toolStripButton8, toolStripButton5, toolStripButton1, toolStripButton3, toolStripButton7, toolStripButton6 });
             toolStrip1.Location = new Point(0, 34);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(1661, 57);
+            toolStrip1.Size = new Size(1145, 57);
             toolStrip1.TabIndex = 3;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -198,6 +278,16 @@
             toolStripButton4.Text = "添加";
             toolStripButton4.TextImageRelation = TextImageRelation.ImageAboveText;
             toolStripButton4.Click += toolStripButton4_Click;
+            // 
+            // toolStripButton8
+            // 
+            toolStripButton8.Image = Properties.Resources.add;
+            toolStripButton8.ImageTransparentColor = Color.Magenta;
+            toolStripButton8.Name = "toolStripButton8";
+            toolStripButton8.Size = new Size(86, 52);
+            toolStripButton8.Text = "抓取添加";
+            toolStripButton8.TextImageRelation = TextImageRelation.ImageAboveText;
+            toolStripButton8.Click += toolStripButton8_Click;
             // 
             // toolStripButton5
             // 
@@ -259,7 +349,7 @@
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
             textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(1655, 456);
+            textBox1.Size = new Size(1139, 295);
             textBox1.TabIndex = 5;
             // 
             // groupBox1
@@ -268,7 +358,7 @@
             groupBox1.Dock = DockStyle.Fill;
             groupBox1.Location = new Point(0, 0);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(1661, 485);
+            groupBox1.Size = new Size(1145, 324);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "信息";
@@ -287,79 +377,21 @@
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(groupBox1);
-            splitContainer1.Size = new Size(1661, 978);
-            splitContainer1.SplitterDistance = 489;
+            splitContainer1.Size = new Size(1145, 655);
+            splitContainer1.SplitterDistance = 327;
             splitContainer1.TabIndex = 6;
-            // 
-            // id
-            // 
-            id.DataPropertyName = "id";
-            id.HeaderText = "id";
-            id.MinimumWidth = 8;
-            id.Name = "id";
-            id.ReadOnly = true;
-            // 
-            // cidDataGridViewTextBoxColumn
-            // 
-            cidDataGridViewTextBoxColumn.DataPropertyName = "cid";
-            cidDataGridViewTextBoxColumn.HeaderText = "cid";
-            cidDataGridViewTextBoxColumn.MinimumWidth = 8;
-            cidDataGridViewTextBoxColumn.Name = "cidDataGridViewTextBoxColumn";
-            cidDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // downloadTypeDataGridViewTextBoxColumn
-            // 
-            downloadTypeDataGridViewTextBoxColumn.DataPropertyName = "downloadType";
-            downloadTypeDataGridViewTextBoxColumn.HeaderText = "downloadType";
-            downloadTypeDataGridViewTextBoxColumn.MinimumWidth = 8;
-            downloadTypeDataGridViewTextBoxColumn.Name = "downloadTypeDataGridViewTextBoxColumn";
-            downloadTypeDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // titleDataGridViewTextBoxColumn
-            // 
-            titleDataGridViewTextBoxColumn.DataPropertyName = "title";
-            titleDataGridViewTextBoxColumn.HeaderText = "title";
-            titleDataGridViewTextBoxColumn.MinimumWidth = 8;
-            titleDataGridViewTextBoxColumn.Name = "titleDataGridViewTextBoxColumn";
-            titleDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // coverDataGridViewImageColumn
-            // 
-            coverDataGridViewImageColumn.DataPropertyName = "cover";
-            coverDataGridViewImageColumn.HeaderText = "cover";
-            coverDataGridViewImageColumn.MinimumWidth = 8;
-            coverDataGridViewImageColumn.Name = "coverDataGridViewImageColumn";
-            coverDataGridViewImageColumn.ReadOnly = true;
-            // 
-            // stateDataGridViewTextBoxColumn
-            // 
-            stateDataGridViewTextBoxColumn.DataPropertyName = "stateDisplay";
-            stateDataGridViewTextBoxColumn.HeaderText = "state";
-            stateDataGridViewTextBoxColumn.MinimumWidth = 8;
-            stateDataGridViewTextBoxColumn.Name = "stateDataGridViewTextBoxColumn";
-            stateDataGridViewTextBoxColumn.ReadOnly = true;
-            // 
-            // stateID
-            // 
-            stateID.DataPropertyName = "state";
-            stateID.HeaderText = "stateID";
-            stateID.MinimumWidth = 8;
-            stateID.Name = "stateID";
-            stateID.ReadOnly = true;
-            stateID.Visible = false;
             // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1661, 1091);
+            ClientSize = new Size(1145, 768);
             Controls.Add(splitContainer1);
             Controls.Add(toolStrip1);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
             Margin = new Padding(5);
-            MinimumSize = new Size(973, 781);
             Name = "Main";
             Text = "Downloader";
             FormClosed += Main_FormClosed;
@@ -409,11 +441,14 @@
         private SplitContainer splitContainer1;
         private DataGridViewTextBoxColumn id;
         private DataGridViewTextBoxColumn cidDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn downloaderType;
         private DataGridViewTextBoxColumn downloadTypeDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn titleDataGridViewTextBoxColumn;
         private DataGridViewImageColumn coverDataGridViewImageColumn;
         private DataGridViewTextBoxColumn stateDataGridViewTextBoxColumn;
+        private DataGridViewTextBoxColumn progress;
         private DataGridViewTextBoxColumn stateID;
+        private ToolStripButton toolStripButton8;
     }
 }
 

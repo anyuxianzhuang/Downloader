@@ -19,8 +19,16 @@
 
         public void InvokeFun(Action action)
         {
-            if (this.InvokeRequired)
+            if (InvokeRequired)
                 Invoke(action);
+            else
+                action();
+        }
+
+        public void BeginInvokeFun(Action action)
+        {
+            if (InvokeRequired)
+                BeginInvoke(action);
             else
                 action();
         }

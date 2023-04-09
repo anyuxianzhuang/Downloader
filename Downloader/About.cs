@@ -18,6 +18,6 @@ namespace Downloader
             textBox1.Text = string.Join(Environment.NewLine, thankList);
         }
 
-        public List<string> thankList = new List<string>() { "dmf", "v2ray", "Newtonsoft.Json", "log4net" };
+        public List<string> thankList = new List<string>() { "dmf", "vod", "v2ray", "Newtonsoft.Json", "log4net" };
     }
 }

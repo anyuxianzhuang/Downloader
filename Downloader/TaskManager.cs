@@ -1,9 +1,9 @@
 ﻿using Downloader.Common;
 using Downloader.Config;
 using Downloader.Downloader;
+using Downloader.Interface;
 using Downloader.Model;
-using Downloader.Model.ViewModel;
-using System.Threading.Tasks;
+using Downloader.Task;
 
 namespace Downloader
 {
@@ -11,34 +11,74 @@ namespace Downloader
     {
         public TaskManager()
         {
-            Downloaders = new List<DMFDownloader>();
+            Downloaders = new List<IDownloader>();
             NewCancellationToken();
         }
-        public List<DMFDownloader> Downloaders { get; private set; }
+        public List<IDownloader> Downloaders { get; private set; }
         public int runingCount = 0;
         private int sleepTime = 1000;
         private int state = 0;
         private Task<int> stateCheckTask;
         CancellationTokenSource cancellationToken;
         public CancellationToken token = CancellationToken.None;
-        public List<DMFTaskDTO> dMFTaskDTOs
+        public List<TaskDTO> dMFTaskDTOs
         {
             get
             {
-                List<DMFTaskDTO> _dMFTaskDTOs = new List<DMFTaskDTO>();
+                List<TaskDTO> _dMFTaskDTOs = new List<TaskDTO>();
                 _dMFTaskDTOs.Clear();
                 foreach (var downTask in Downloaders)
-                    _dMFTaskDTOs.Add(new DMFTaskDTO()
+                    switch (downTask)
                     {
-                        id = downTask.id,
-                        cid = downTask.dmfTask.cid,
-                        cover = downTask.dmfTask.cover,
-                        downloadType = downTask.dmfTask.downloadType,
-                        stateDisplay = stateToDisplay(downTask.state),
-                        state = downTask.state,
-                        progress = downTask.progress,
-                        title = downTask.dmfTask.title
-                    });
+                        case DMFDownloader:
+                            var dmfDown = (DMFDownloader)downTask;
+                            var dmfTask = (DMFTask)dmfDown.task;
+                            _dMFTaskDTOs.Add(new TaskDTO()
+                            {
+                                id = dmfDown.id,
+                                cid = dmfTask.vid,
+                                cover = dmfTask.cover,
+                                downloadType = dmfTask.downloadType,
+                                downloaderType = nameof(DMFDownloader),
+                                stateDisplay = stateToDisplay(dmfDown.state),
+                                state = dmfDown.state,
+                                title = dmfTask.title
+                            });
+                            break;
+                        case VodkaDownloader:
+                            var vodDown = (VodkaDownloader)downTask;
+                            var vodTask = (VodTask)vodDown.task;
+                            _dMFTaskDTOs.Add(new TaskDTO()
+                            {
+                                id = vodDown.id,
+                                cid = vodTask.vid,
+                                cover = vodTask.cover,
+                                downloadType = vodTask.downloadType,
+                                downloaderType = nameof(VodkaDownloader),
+                                stateDisplay = stateToDisplay(vodDown.state),
+                                state = vodDown.state,
+                                title = vodTask.title
+                            });
+                            break;
+                        case VodkaConsoleDownloader:
+                            var vodDown2 = (VodkaConsoleDownloader)downTask;
+                            var vodTask2 = (VodTask)vodDown2.task;
+                            _dMFTaskDTOs.Add(new TaskDTO()
+                            {
+                                id = vodDown2.id,
+                                cid = vodTask2.vid,
+                                cover = vodTask2.cover,
+                                downloadType = vodTask2.downloadType,
+                                downloaderType = nameof(VodkaConsoleDownloader),
+                                stateDisplay = stateToDisplay(vodDown2.state),
+                                state = vodDown2.state,
+                                title = vodTask2.title
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+
                 return _dMFTaskDTOs;
             }
         }
@@ -68,14 +108,14 @@ namespace Downloader
         /// </summary>
         /// <param name="downloader"></param>
         /// <returns></returns>
-        public void Add(DMFDownloader downloader)
+        public void Add(IDownloader downloader)
         {
             if (Downloaders == null)
                 return;
             Downloaders.Add(downloader);
         }
 
-        public void Delete(DMFDownloader downloader)
+        public void Delete(IDownloader downloader)
         {
             for (int i = Downloaders.Count - 1; i >= 0; i--)
             {
@@ -84,13 +124,13 @@ namespace Downloader
                     Downloaders.RemoveAt(i);
             }
         }
-        public bool Contains(DMFDownloader downloader)
+        public bool Contains(IDownloader downloader)
         {
             return Downloaders.Contains(downloader);
         }
-        public List<DMFDownloader> DTOToDownloader(List<DMFTaskDTO> dMFTaskDTOs)
+        public List<IDownloader> DTOToDownloader(List<TaskDTO> dMFTaskDTOs)
         {
-            List<DMFDownloader> dMFDownloaders = new List<DMFDownloader>();
+            List<IDownloader> dMFDownloaders = new List<IDownloader>();
             if (dMFTaskDTOs != null)
                 for (int i = 0; i < dMFTaskDTOs.Count; i++)
                 {
@@ -108,10 +148,9 @@ namespace Downloader
         /// <param name="downloaders"></param>
         /// <param name="mode">1 按照指定并行数全部运行 2 任意数量运行</param>
         /// <returns></returns>
-        public Task<int> Start(List<DMFDownloader> downloaders, int mode)
+        public Task<int> Start(List<IDownloader> downloaders, int mode)
         {
             NewCancellationToken();
-
             if (stateCheckTask == null || stateCheckTask.Status == TaskStatus.RanToCompletion)
             {
                 stateCheckTask = new Task<int>(() =>
@@ -129,13 +168,15 @@ namespace Downloader
                                     state = 0;
                                     return state;
                                 }
-                                DMFDownloader t = Downloaders[m];
+                                IDownloader t = Downloaders[m];
                                 if (t == null)
+                                    continue;
+                                if (t.state != 0)
                                     continue;
                                 if (mode == 1 && runingCount < GUIConfig.taskParallelCount)
                                 {
                                     t.Start(token);
-                                    runingCount++;
+                                    Interlocked.Increment(ref runingCount);
                                 }
                             }
                             Thread.Sleep(sleepTime);
@@ -159,8 +200,10 @@ namespace Downloader
                 {
                     if (token.IsCancellationRequested)
                         break;
-                    DMFDownloader t = downloaders[m];
+                    IDownloader t = downloaders[m];
                     if (t == null)
+                        continue;
+                    if (t.state == 1)
                         continue;
                     if (t.state == 2)
                         continue;
@@ -171,7 +214,7 @@ namespace Downloader
                         else
                         {
                             t.Start(token);
-                            runingCount++;
+                            Interlocked.Increment(ref runingCount);
                         }
                     }
                 }
@@ -182,10 +225,10 @@ namespace Downloader
         {
             return Start(Downloaders, 1);
         }
-        public void Stop(List<DMFDownloader> downloaders)
+        public void Stop(List<IDownloader> downloaders)
         {
             if (downloaders != null)
-                foreach (DMFDownloader downloader in downloaders)
+                foreach (IDownloader downloader in downloaders)
                     downloader.Cancel();
         }
         public void StopAll()
