@@ -19,6 +19,7 @@ namespace Downloader
             InitializeComponent();
             this.ShowInTaskbar = false;
             调试模式DToolStripMenuItem.Checked = Loger.showDebugInfo;
+            this.Text = this.Text + " " + GUIConfig.version;
             Loger.MessageAcceptanceHandler += (msg) =>
             {
                 BeginInvokeFun(() =>

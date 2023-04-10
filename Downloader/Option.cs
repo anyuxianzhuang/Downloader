@@ -1,5 +1,6 @@
 ﻿using Downloader.Config;
 using System.ComponentModel;
+using System.Net;
 
 namespace Downloader
 {
@@ -11,8 +12,27 @@ namespace Downloader
             comboBox1.Items.AddRange(GUIConfig._VodkaConfig.saveTypes.ToArray());
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedItem = comboBox1.Items[0];
+            UseProxyUIUpdate();
         }
 
+        private bool CheckUseProxy()
+        {
+            var proxy = WebRequest.GetSystemWebProxy();
+            if (proxy == null)
+                return false;
+            if (proxy.ToString()?.IndexOf("HttpWindowsProxy") >= 0)
+                return true;
+            else if (proxy.ToString()?.IndexOf("HttpNoProxy") >= 0)
+                return false;
+            return false;
+        }
+        private void UseProxyUIUpdate()
+        {
+            if (CheckUseProxy())
+                label9.Text = "当前系统存在代理";
+            else
+                label9.Text = "当前系统不存在代理(Proxifier和VPN自行检测)";
+        }
         private void LoadData()
         {
             textBox6.Text = GUIConfig.saveFilePath;
@@ -40,6 +60,8 @@ namespace Downloader
             numericUpDown5.Value = GUIConfig._VodkaConfig.parallel2DCount;
             numericUpDown6.Value = GUIConfig._VodkaConfig.parallel4KCount;
             numericUpDown7.Value = GUIConfig._VodkaConfig.parallelVRCount;
+            checkBox2.Checked = GUIConfig._VodkaConfig.autoDownAll;
+            checkBox7.Checked = GUIConfig._VodkaConfig.delTempFile;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -49,9 +71,9 @@ namespace Downloader
                 CheckConfigSetting();
 
                 GUIConfig._DMFConfig.DMFPath = textBox1.Text;
-                if (!string.IsNullOrWhiteSpace(textBox6.Text))
+                GUIConfig.saveFilePath = textBox6.Text;
+                if (!string.IsNullOrWhiteSpace(GUIConfig.saveFilePath))
                 {
-                    GUIConfig.saveFilePath = textBox6.Text;
                     GUIConfig._DMFConfig.DMFSavePath = GUIConfig.saveFilePath;
                     GUIConfig._VodkaConfig.savePath = GUIConfig.saveFilePath;
                 }
@@ -83,6 +105,8 @@ namespace Downloader
                 GUIConfig._VodkaConfig.parallel2DCount = (int)numericUpDown5.Value;
                 GUIConfig._VodkaConfig.parallel4KCount = (int)numericUpDown6.Value;
                 GUIConfig._VodkaConfig.parallelVRCount = (int)numericUpDown7.Value;
+                GUIConfig._VodkaConfig.autoDownAll = checkBox2.Checked;
+                GUIConfig._VodkaConfig.delTempFile = checkBox7.Checked;
 
                 GUIConfig.Save();
                 DialogResult = DialogResult.OK;
@@ -95,12 +119,40 @@ namespace Downloader
 
         private void CheckConfigSetting()
         {
-            if (!Directory.Exists(textBox6.Text))
-                throw new Exception("保存路径输入错误");
-            if (!Directory.Exists(textBox3.Text))
-                throw new Exception("dmf保存路径输入错误");
-            if (!Directory.Exists(textBox9.Text))
-                throw new Exception("vodka保存路径输入错误");
+            if (!string.IsNullOrWhiteSpace(textBox6.Text) && !Directory.Exists(textBox6.Text))
+                throw new Exception("保存路径不存在");
+            if (!string.IsNullOrWhiteSpace(textBox1.Text))
+            {
+                if (string.IsNullOrWhiteSpace(textBox3.Text))
+                {
+                    var dmfVideo = Path.Combine(textBox1.Text, "Video");
+                    textBox3.Text = dmfVideo;
+                    Directory.CreateDirectory(dmfVideo);
+                }
+                if (string.IsNullOrWhiteSpace(textBox4.Text))
+                {
+                    var dmfTmp = Path.Combine(textBox1.Text, "tmp");
+                    textBox4.Text = dmfTmp;
+                    Directory.CreateDirectory(dmfTmp);
+                }
+                if (!Directory.Exists(textBox3.Text))
+                    throw new Exception("dmf保存路径不存在");
+                if (!Directory.Exists(textBox4.Text))
+                    throw new Exception("dmf缓存路径不存在");
+            }
+            if (!string.IsNullOrWhiteSpace(textBox8.Text))
+            {
+                if (string.IsNullOrWhiteSpace(textBox9.Text))
+                {
+                    var vodVideo = Path.Combine(textBox8.Text, "Video");
+                    textBox9.Text = vodVideo;
+                    Directory.CreateDirectory(vodVideo);
+                }
+                if (!Directory.Exists(textBox9.Text))
+                    throw new Exception("vodka保存路径不存在");
+                if (!string.IsNullOrWhiteSpace(textBox7.Text) && !Directory.Exists(textBox7.Text))
+                    throw new Exception("vodka移动路径不存在");
+            }
             if (numericUpDown1.Value <= 0)
                 throw new Exception("DMFVideoThreading输入错误");
             if (string.IsNullOrWhiteSpace(textBox5.Text))
@@ -153,8 +205,11 @@ namespace Downloader
 
         private void textBox6_Validated(object sender, EventArgs e)
         {
-            textBox3.Text = textBox6.Text;
-            textBox9.Text = textBox6.Text;
+            if (!string.IsNullOrEmpty(textBox6.Text) && Directory.Exists(textBox6.Text))
+            {
+                textBox3.Text = textBox6.Text;
+                textBox9.Text = textBox6.Text;
+            }
         }
 
         private void textBox8_Validating(object sender, CancelEventArgs e)

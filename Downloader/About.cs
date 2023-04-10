@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Downloader.Config;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +17,7 @@ namespace Downloader
         {
             InitializeComponent();
             textBox1.Text = string.Join(Environment.NewLine, thankList);
+            label4.Text = "版本: " + GUIConfig.version;
         }
 
         public List<string> thankList = new List<string>() { "dmf", "vod", "v2ray", "Newtonsoft.Json", "log4net" };

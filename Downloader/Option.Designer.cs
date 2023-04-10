@@ -32,6 +32,7 @@
             label1 = new Label();
             textBox1 = new TextBox();
             groupBox1 = new GroupBox();
+            label9 = new Label();
             textBox2 = new TextBox();
             checkBox1 = new CheckBox();
             textBox5 = new TextBox();
@@ -65,6 +66,7 @@
             label11 = new Label();
             tabPage2 = new TabPage();
             tabPage3 = new TabPage();
+            checkBox2 = new CheckBox();
             label18 = new Label();
             textBox9 = new TextBox();
             numericUpDown7 = new NumericUpDown();
@@ -80,6 +82,7 @@
             label13 = new Label();
             textBox7 = new TextBox();
             label12 = new Label();
+            checkBox7 = new CheckBox();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
@@ -118,30 +121,41 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label9);
             groupBox1.Controls.Add(textBox2);
             groupBox1.Controls.Add(checkBox1);
             groupBox1.Location = new Point(18, 312);
             groupBox1.Margin = new Padding(9, 8, 9, 8);
             groupBox1.Name = "groupBox1";
             groupBox1.Padding = new Padding(9, 8, 9, 8);
-            groupBox1.Size = new Size(527, 59);
+            groupBox1.Size = new Size(527, 94);
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "代理设置";
             // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.ForeColor = Color.Red;
+            label9.Location = new Point(113, 59);
+            label9.Name = "label9";
+            label9.Size = new Size(104, 17);
+            label9.TabIndex = 6;
+            label9.Text = "当前系统存在代理";
+            // 
             // textBox2
             // 
-            textBox2.Location = new Point(135, 22);
+            textBox2.Location = new Point(113, 24);
             textBox2.Margin = new Padding(9, 8, 9, 8);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(351, 23);
+            textBox2.Size = new Size(257, 23);
             textBox2.TabIndex = 5;
             toolTip1.SetToolTip(textBox2, "代理示例：http://127.0.0.1:8888");
             // 
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(40, 24);
+            checkBox1.Location = new Point(18, 26);
             checkBox1.Margin = new Padding(9, 8, 9, 8);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(75, 21);
@@ -269,7 +283,7 @@
             // 
             // button1
             // 
-            button1.Location = new Point(183, 459);
+            button1.Location = new Point(186, 494);
             button1.Margin = new Padding(9, 8, 9, 8);
             button1.Name = "button1";
             button1.Size = new Size(118, 28);
@@ -280,7 +294,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(346, 459);
+            button2.Location = new Point(349, 494);
             button2.Margin = new Padding(9, 8, 9, 8);
             button2.Name = "button2";
             button2.Size = new Size(119, 28);
@@ -295,7 +309,7 @@
             groupBox3.Controls.Add(label20);
             groupBox3.Controls.Add(numericUpDown4);
             groupBox3.Controls.Add(label8);
-            groupBox3.Location = new Point(18, 387);
+            groupBox3.Location = new Point(19, 422);
             groupBox3.Margin = new Padding(9, 8, 9, 8);
             groupBox3.Name = "groupBox3";
             groupBox3.Padding = new Padding(9, 8, 9, 8);
@@ -478,6 +492,8 @@
             // tabPage3
             // 
             tabPage3.BackColor = SystemColors.Control;
+            tabPage3.Controls.Add(checkBox7);
+            tabPage3.Controls.Add(checkBox2);
             tabPage3.Controls.Add(label18);
             tabPage3.Controls.Add(textBox9);
             tabPage3.Controls.Add(numericUpDown7);
@@ -500,6 +516,16 @@
             tabPage3.Size = new Size(522, 253);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Vod";
+            // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Location = new Point(368, 130);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(123, 21);
+            checkBox2.TabIndex = 23;
+            checkBox2.Text = "是否下载所有part";
+            checkBox2.UseVisualStyleBackColor = true;
             // 
             // label18
             // 
@@ -650,10 +676,20 @@
             label12.TabIndex = 6;
             label12.Text = "移动路径";
             // 
+            // checkBox7
+            // 
+            checkBox7.AutoSize = true;
+            checkBox7.Location = new Point(368, 168);
+            checkBox7.Name = "checkBox7";
+            checkBox7.Size = new Size(99, 21);
+            checkBox7.TabIndex = 24;
+            checkBox7.Text = "是否删除缓存";
+            checkBox7.UseVisualStyleBackColor = true;
+            // 
             // Option
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
-            ClientSize = new Size(566, 500);
+            ClientSize = new Size(566, 539);
             Controls.Add(tabControl1);
             Controls.Add(groupBox3);
             Controls.Add(button2);
@@ -741,5 +777,8 @@
         private NumericUpDown numericUpDown8;
         private Label label20;
         private Label label19;
+        private Label label9;
+        private CheckBox checkBox2;
+        private CheckBox checkBox7;
     }
 }
