@@ -51,6 +51,7 @@ namespace Downloader
 
         private void Login_FormClosed(object sender, FormClosedEventArgs e)
         {
+            GUIConfig.Save();
             DialogResult = DialogResult.Cancel;
         }
     }
