@@ -122,7 +122,7 @@ namespace Downloader.Config
             iniEx.WriteContentValue("VodConfig", "VodDownloadType", _VodkaConfig.VodDownloadType != null ? string.Join(splitStr, _VodkaConfig.VodDownloadType.ToArray()) : "");
             iniEx.WriteContentValue("VodConfig", "isLogin", _VodkaConfig.isLogin ? "1" : "0");
 
-            iniEx.WriteContentValue("proxyConfig", "host", proxyHost.Host);
+            iniEx.WriteContentValue("proxyConfig", "host", proxyHost.AbsoluteUri);
             iniEx.WriteContentValue("proxyConfig", "enable", proxyEnable ? "1" : "0");
 
             iniEx.WriteContentValue("taskConfig", "taskParallelCount", taskParallelCount.ToString());
